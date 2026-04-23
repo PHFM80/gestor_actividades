@@ -1,0 +1,64 @@
+{% extends "dashboard/base.html" %}
+
+{% block dashboard_content %}
+<section class="card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <div>
+        <h1 class="h4 mb-1">Carga manual de turno</h1>
+        <p class="text-muted mb-0">Registra un turno para la empresa y deja la notificacion pendiente para el cliente.</p>
+      </div>
+      <a href="/dashboard/" class="btn btn-outline-light btn-sm">Volver al calendario</a>
+    </div>
+
+    {% if messages %}
+      <div class="d-flex flex-column gap-2 mb-3">
+        {% for message in messages %}
+          {% if message.tags == "error" %}
+            <div class="alert alert-danger mb-0" role="alert">{{ message }}</div>
+          {% elif message.tags == "warning" %}
+            <div class="alert alert-warning mb-0" role="alert">{{ message }}</div>
+          {% else %}
+            <div class="alert alert-success mb-0" role="alert">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post" class="d-flex flex-column gap-4">
+      {% csrf_token %}
+
+      <div>
+        <h2 class="h6 mb-3">Turno</h2>
+        <div class="row g-3">
+          <div class="col-md-6">{{ form.servicio_empresa.label_tag }}{{ form.servicio_empresa }}{% if form.servicio_empresa.errors %}<div class="invalid-feedback d-block">{{ form.servicio_empresa.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-3">{{ form.fecha.label_tag }}{{ form.fecha }}{% if form.fecha.errors %}<div class="invalid-feedback d-block">{{ form.fecha.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-3">{{ form.hora_inicio.label_tag }}{{ form.hora_inicio }}{% if form.hora_inicio.errors %}<div class="invalid-feedback d-block">{{ form.hora_inicio.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-6">{{ form.empleado.label_tag }}{{ form.empleado }}{% if form.empleado.errors %}<div class="invalid-feedback d-block">{{ form.empleado.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-6">{{ form.puesto.label_tag }}{{ form.puesto }}{% if form.puesto.errors %}<div class="invalid-feedback d-block">{{ form.puesto.errors|join:", " }}</div>{% endif %}</div>
+        </div>
+      </div>
+
+      <div>
+        <h2 class="h6 mb-3">Datos del cliente</h2>
+        <div class="row g-3">
+          <div class="col-md-6">{{ form.cliente_nombre.label_tag }}{{ form.cliente_nombre }}{% if form.cliente_nombre.errors %}<div class="invalid-feedback d-block">{{ form.cliente_nombre.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-6">{{ form.cliente_apellido.label_tag }}{{ form.cliente_apellido }}{% if form.cliente_apellido.errors %}<div class="invalid-feedback d-block">{{ form.cliente_apellido.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-4">{{ form.cliente_dni.label_tag }}{{ form.cliente_dni }}{% if form.cliente_dni.errors %}<div class="invalid-feedback d-block">{{ form.cliente_dni.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-4">{{ form.cliente_telefono.label_tag }}{{ form.cliente_telefono }}{% if form.cliente_telefono.errors %}<div class="invalid-feedback d-block">{{ form.cliente_telefono.errors|join:", " }}</div>{% endif %}</div>
+          <div class="col-md-4">{{ form.cliente_email.label_tag }}{{ form.cliente_email }}{% if form.cliente_email.errors %}<div class="invalid-feedback d-block">{{ form.cliente_email.errors|join:", " }}</div>{% endif %}</div>
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary">Guardar turno pendiente</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
+

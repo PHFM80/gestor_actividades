@@ -1,0 +1,124 @@
+.dashboard {
+  min-height: calc(100vh - 140px);
+}
+
+.dashboard-sidebar {
+  background: var(--app-sidebar-bg);
+  min-height: 100%;
+  border-right: 1px solid var(--app-sidebar-border);
+}
+
+.sidebar-brand {
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--app-accent);
+}
+
+.sidebar-link {
+  color: var(--app-muted);
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 10px;
+}
+
+.sidebar-link.active,
+.sidebar-link:hover {
+  background: var(--app-sidebar-active-bg);
+  color: var(--app-text);
+}
+
+.dashboard-main {
+  background: var(--app-dashboard-main-bg);
+}
+
+.dashboard-topbar {
+  border-bottom: 1px solid var(--app-border);
+  padding-bottom: 1.25rem;
+}
+
+.dashboard-welcome {
+  width: 100%;
+}
+
+.complemento-card {
+  display: block;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+  text-decoration: none;
+  box-shadow: var(--app-card-shadow);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.complemento-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--app-accent);
+}
+
+.complemento-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.complemento-item {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+}
+
+.empresa-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--app-card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empresa-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.empresa-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.usuario-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--app-card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.usuario-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.usuario-card-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 991px) {
+  .dashboard-sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--app-sidebar-border);
+  }
+}

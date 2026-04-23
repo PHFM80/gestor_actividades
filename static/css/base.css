@@ -1,0 +1,199 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Sora", system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--app-bg-gradient);
+  color: var(--app-text);
+  min-height: 100vh;
+}
+
+.bg-app {
+  background-color: var(--app-bg);
+}
+
+.text-app {
+  color: var(--app-text);
+}
+
+.app-header {
+  background: var(--app-header-bg);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--app-header-border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--app-accent);
+  color: #1d1d1d;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-name {
+  font-weight: 600;
+}
+
+.nav-link-app {
+  color: var(--app-text);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.nav-link-app:hover {
+  color: var(--app-accent);
+}
+
+.app-footer {
+  border-top: 1px solid var(--app-footer-border);
+  background: var(--app-footer-bg);
+}
+
+.footer-link {
+  color: var(--app-muted);
+  text-decoration: none;
+}
+
+.footer-link:hover {
+  color: var(--app-text);
+}
+
+.btn-primary {
+  background-color: var(--app-accent);
+  border-color: var(--app-accent);
+  color: #1d1d1d;
+}
+
+.btn-primary:hover {
+  background-color: var(--app-accent-dark);
+  border-color: var(--app-accent-dark);
+}
+
+.btn-outline-light {
+  border-color: var(--app-outline);
+  color: var(--app-text);
+}
+
+.hero-card,
+.auth-card,
+.feature-card,
+.welcome-card {
+  background: var(--app-surface);
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: var(--app-card-shadow);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: var(--app-accent);
+  margin-bottom: 1rem;
+}
+
+.auth {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+}
+
+.theme-toggle {
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--app-surface-hover);
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
+}
+
+[data-theme="dark"] .theme-icon-sun,
+[data-theme="light"] .theme-icon-moon {
+  display: none;
+}
+
+@media (max-width: 1199px) {
+  .app-header .btn {
+    padding: 0.35rem 0.75rem;
+  }
+}
+
+@media (max-width: 991px) {
+  .brand-name {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .hero-card {
+    margin-top: 2rem;
+  }
+
+  .auth {
+    min-height: auto;
+  }
+}
+
+.password-field {
+  position: relative;
+}
+
+.password-field .form-control {
+  padding-right: 44px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  color: var(--app-muted);
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-toggle:hover {
+  color: var(--app-text);
+}
+
+.password-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.password-toggle[data-visible="true"] .password-icon-show {
+  display: none;
+}
+
+.password-toggle[data-visible="false"] .password-icon-hide {
+  display: none;
+}

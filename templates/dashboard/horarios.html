@@ -1,0 +1,107 @@
+{% extends "dashboard/base.html" %}
+
+{% block dashboard_content %}
+<section class="card border-0 shadow-sm">
+  <div class="card-body p-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+      <div>
+        <h1 class="h4 mb-1">Horarios de atencion</h1>
+        <p class="text-muted mb-0">Agrega, modifica o elimina los horarios de la empresa.</p>
+      </div>
+      <a href="/dashboard/" class="btn btn-outline-light btn-sm">Volver al calendario</a>
+    </div>
+
+    {% if messages %}
+      <div class="d-flex flex-column gap-2 mb-3">
+        {% for message in messages %}
+          {% if message.tags == "error" %}
+            <div class="alert alert-danger mb-0" role="alert">{{ message }}</div>
+          {% elif message.tags == "warning" %}
+            <div class="alert alert-warning mb-0" role="alert">{{ message }}</div>
+          {% else %}
+            <div class="alert alert-success mb-0" role="alert">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="border rounded-4 p-3 h-100">
+          <h2 class="h6 mb-3">Agregar horario</h2>
+
+          {% if horario_form.non_field_errors %}
+            <div class="alert alert-danger" role="alert">{{ horario_form.non_field_errors }}</div>
+          {% endif %}
+
+          <form method="post" class="d-flex flex-column gap-3">
+            {% csrf_token %}
+            <input type="hidden" name="form_type" value="horario_crear">
+            <div>
+              {{ horario_form.dia_semana.label_tag }}
+              {{ horario_form.dia_semana }}
+              {% if horario_form.dia_semana.errors %}<div class="invalid-feedback d-block">{{ horario_form.dia_semana.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div>
+              {{ horario_form.hora_inicio.label_tag }}
+              {{ horario_form.hora_inicio }}
+              {% if horario_form.hora_inicio.errors %}<div class="invalid-feedback d-block">{{ horario_form.hora_inicio.errors|join:", " }}</div>{% endif %}
+            </div>
+            <div>
+              {{ horario_form.hora_fin.label_tag }}
+              {{ horario_form.hora_fin }}
+              {% if horario_form.hora_fin.errors %}<div class="invalid-feedback d-block">{{ horario_form.hora_fin.errors|join:", " }}</div>{% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary">Agregar horario</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <div class="border rounded-4 p-3 h-100">
+          <h2 class="h6 mb-3">Horarios cargados</h2>
+
+          {% if horarios %}
+            <div class="d-flex flex-column gap-3">
+              {% for horario in horarios %}
+                <form method="post" class="border rounded-3 p-3">
+                  {% csrf_token %}
+                  <input type="hidden" name="horario_id" value="{{ horario.id }}">
+
+                  <div class="row g-2 align-items-end">
+                    <div class="col-md-4">
+                      <label class="form-label" for="dia_semana_{{ horario.id }}">Dia</label>
+                      <select class="form-select" id="dia_semana_{{ horario.id }}" name="dia_semana" required>
+                        {% for value, label in dias_semana %}
+                          <option value="{{ value }}" {% if horario.dia_semana == value %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label" for="hora_inicio_{{ horario.id }}">Desde</label>
+                      <input class="form-control" id="hora_inicio_{{ horario.id }}" type="time" name="hora_inicio" value="{{ horario.hora_inicio|time:'H:i' }}" required>
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label" for="hora_fin_{{ horario.id }}">Hasta</label>
+                      <input class="form-control" id="hora_fin_{{ horario.id }}" type="time" name="hora_fin" value="{{ horario.hora_fin|time:'H:i' }}" required>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                      <button type="submit" name="form_type" value="horario_actualizar" class="btn btn-outline-light btn-sm">Guardar</button>
+                    </div>
+                  </div>
+
+                  <div class="d-flex justify-content-end mt-2">
+                    <button type="submit" name="form_type" value="horario_eliminar" class="btn btn-outline-danger btn-sm" onclick="return confirm('¿Eliminar este horario?');">Eliminar</button>
+                  </div>
+                </form>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted mb-0">Aun no hay horarios cargados para la empresa.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

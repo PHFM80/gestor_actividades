@@ -1,0 +1,93 @@
+.hero {
+  background: var(--app-hero-gradient);
+}
+
+.hero-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card::after {
+  content: "";
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--app-hero-spot);
+}
+
+.features {
+  background: var(--app-feature-bg);
+}
+
+.feature-card {
+  min-height: 160px;
+}
+
+.servicios-hero {
+  background: var(--app-hero-gradient);
+}
+
+.servicios-filter {
+  min-width: 240px;
+}
+
+.servicios-list {
+  background: var(--app-bg);
+}
+
+.empresa-public-card {
+  background: var(--app-surface);
+  border: 1px solid var(--app-border);
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: var(--app-card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.empresa-public-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.turno-hero {
+  background: var(--app-hero-gradient);
+}
+
+.turno-content {
+  background: var(--app-bg);
+}
+
+.turno-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.turno-slot {
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--app-text);
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.turno-slot:hover {
+  border-color: var(--app-accent);
+  transform: translateY(-1px);
+}
+
+.turno-slot.active {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 1px var(--app-accent);
+}

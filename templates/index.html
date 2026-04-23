@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestion Turnos | Inicio{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static "css/index.css" %}">
+{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div class="container py-5">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-6">
+        <p class="eyebrow">Gestion de actividades</p>
+        <h1 class="display-4 fw-semibold">Organiza actividades y participantes en un solo lugar.</h1>
+        <p class="lead text-muted">Registra personas, planifica actividades y consulta la informacion clave de forma simple.</p>
+        <div class="d-flex gap-3 flex-wrap">
+          <a href="/login/" class="btn btn-primary btn-lg">Ingresar</a>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="hero-card">
+          <div class="hero-card-body">
+            <h2 class="h5">Resumen general</h2>
+            <ul class="list-unstyled mt-3 mb-0">
+              <li class="d-flex justify-content-between border-bottom py-2">
+                <span>Actividades programadas</span>
+                <strong>24</strong>
+              </li>
+              <li class="d-flex justify-content-between border-bottom py-2">
+                <span>Personas registradas</span>
+                <strong>128</strong>
+              </li>
+              <li class="d-flex justify-content-between py-2">
+                <span>Donaciones registradas</span>
+                <strong>36</strong>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="features">
+  <div class="container py-5">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="feature-card">
+          <h3 class="h5">Actividades</h3>
+          <p class="text-muted">Visualiza y organiza actividades desde una vista clara.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <h3 class="h5">Personas</h3>
+          <p class="text-muted">Gestiona participantes y sus datos de forma ordenada.</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="feature-card">
+          <h3 class="h5">Donaciones</h3>
+          <p class="text-muted">Registra donaciones y manten trazabilidad de cada item.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static "js/index.js" %}"></script>
+{% endblock %}
