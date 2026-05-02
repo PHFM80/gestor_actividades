@@ -1,0 +1,62 @@
+{% extends "dashboard/base.html" %}
+{% load static %}
+
+{% block dashboard_content %}
+<div class="dashboard-welcome">
+  <h1 class="h3 mb-2">Complementos</h1>
+  <p class="text-muted mb-4">Catalogos base disponibles para parametrizar el sistema.</p>
+  <div class="welcome-card mb-4">
+    <p class="mb-0">Selecciona el complemento que queres cargar o editar.</p>
+  </div>
+  <div class="row g-3">
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_paises' %}">
+        <h2 class="h6 mb-1">Paises</h2>
+        <p class="text-muted mb-0">Paises disponibles en la plataforma.</p>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_provincias' %}">
+        <h2 class="h6 mb-1">Provincias</h2>
+        <p class="text-muted mb-0">Provincias asociadas a cada pais.</p>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_localidades' %}">
+        <h2 class="h6 mb-1">Localidades</h2>
+        <p class="text-muted mb-0">Localidades asociadas a cada provincia.</p>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_roles_sistema' %}">
+        <h2 class="h6 mb-1">Roles de Sistema</h2>
+        <p class="text-muted mb-0">Roles globales de acceso para usuarios.</p>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_roles_actividad' %}">
+        <h2 class="h6 mb-1">RolActividad</h2>
+        <p class="text-muted mb-0">Funciones posibles dentro de una actividad.</p>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_tipos_documento' %}">
+        <h2 class="h6 mb-1">Tipo de Documento</h2>
+        <p class="text-muted mb-0">Tipos de documento para personas.</p>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_tipos_actividad' %}">
+        <h2 class="h6 mb-1">Tipo de Actividad</h2>
+        <p class="text-muted mb-0">Catalogo base de actividades.</p>
+      </a>
+    </div>
+    <div class="col-sm-6 col-lg-4">
+      <a class="complemento-card" href="{% url 'dashboard_admin_complemento_unidades_medida' %}">
+        <h2 class="h6 mb-1">Unidad de Medida</h2>
+        <p class="text-muted mb-0">Unidades para items de donacion.</p>
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Gestion Turnos | Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static "css/dashboard.css" %}">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+  <div class="container-fluid">
+    <div class="row">
+      <aside class="col-lg-2 dashboard-sidebar p-4">
+        <div class="sidebar-brand">GT</div>
+        <nav class="mt-4 d-flex flex-column gap-2">
+          {% if request.user.is_staff or request.user.is_superuser %}
+            <a href="/dashboard/admin/" class="sidebar-link {% if request.path == '/dashboard/admin/' %}active{% endif %}">Inicio</a>
+            <a href="/dashboard/admin/complementos/" class="sidebar-link {% if '/dashboard/admin/complementos/' in request.path %}active{% endif %}">Complementos</a>
+            <a href="/dashboard/admin/personas/" class="sidebar-link {% if '/dashboard/admin/personas/' in request.path %}active{% endif %}">Cargar Personas</a>
+            <a href="/dashboard/admin/usuarios/" class="sidebar-link {% if '/dashboard/admin/usuarios/' in request.path %}active{% endif %}">Cargar Usuarios</a>
+            <a href="/dashboard/admin/actividad/" class="sidebar-link {% if '/dashboard/admin/actividad/' in request.path %}active{% endif %}">Crear Actividad</a>
+            <a href="/dashboard/admin/metricas/" class="sidebar-link {% if '/dashboard/admin/metricas/' in request.path %}active{% endif %}">Metricas</a>
+            <a href="/dashboard/admin/donaciones/" class="sidebar-link {% if '/dashboard/admin/donaciones/' in request.path %}active{% endif %}">Donaciones</a>
+          {% else %}
+            <a href="/dashboard/" class="sidebar-link {% if request.path == '/dashboard/' %}active{% endif %}">Calendario</a>
+          {% endif %}
+        </nav>
+      </aside>
+      <div class="col-lg-10 dashboard-main p-4">
+        <div class="dashboard-topbar d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+          <div>
+            <h2 class="h5 mb-1">
+              Bienvenido:
+              <span class="text-app">{{ welcome_name|default:request.user }}</span>
+              {% if company_name %}
+                <span class="text-muted">· {{ company_name }}</span>
+              {% endif %}
+            </h2>
+            <p class="text-muted mb-0">{{ role_label|default:"Usuario" }}</p>
+          </div>
+        </div>
+        {% block dashboard_content %}{% endblock %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static "js/dashboard.js" %}"></script>
+{% endblock %}
+

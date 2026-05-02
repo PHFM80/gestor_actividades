@@ -1,30 +1,82 @@
-# Gestor de Actividades
+# Proyecto
 
-Proyecto Django para gestionar personas, actividades y donaciones, con control de acceso por roles y trazabilidad de cambios.
+Este repositorio contiene el proyecto completo, organizado en backend y frontend móvil.
 
-**Guia rapida**
-1. Crear y activar un entorno virtual.
-2. Instalar dependencias.
-3. Configurar variables de entorno.
-4. Aplicar migraciones y cargar datos base.
-5. Levantar el servidor.
+## Estructura general
 
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py seed_initial_data
-python manage.py createsuperuser
-python manage.py runserver
+```text
+proyecto/
+├── README.md
+├── ai/
+├── backend/
+└── frontend/
 ```
 
-**Documentacion**
-- `docs/overview.md` - Panorama funcional y entidades principales.
-- `docs/setup.md` - Configuracion local, variables de entorno y scheduler.
-- `docs/apps.md` - Detalle por aplicacion y modelos clave.
-- `docs/seed.md` - Datos base y comando de carga.
-- `docs/arquitectura.md` - Arquitectura actual y relaciones entre apps.
-- `docs/templates.md` - Vistas, herencia y orden de assets.
-- `docs/themes.md` - Sistema de modo claro/oscuro y variables CSS.
-- `docs/dashboard_admin.md` - Flujos disponibles del panel admin actual.
+## Partes del proyecto
+
+### Backend
+
+El backend contiene:
+
+- Django.
+- Django Templates.
+- Django REST Framework.
+- Lógica de negocio.
+- Modelos y persistencia.
+- APIs para integraciones y frontend móvil.
+
+Leer:
+
+```text
+backend/README.md
+```
+
+### Frontend móvil
+
+El frontend móvil contiene:
+
+- App Kivy.
+- Pantallas móviles.
+- Assets para la app.
+- Configuración de Buildozer.
+- Compilación APK/AAB.
+
+Leer:
+
+```text
+frontend/README.md
+```
+
+## Contexto IA general
+
+El contexto IA general define criterios globales del proyecto.
+
+Leer:
+
+```text
+ai/README.md
+```
+
+## Criterio de documentación
+
+Este `README.md` funciona como índice general.
+
+La documentación específica debe estar en:
+
+```text
+backend/docs/
+frontend/docs/
+```
+
+El contexto específico para IA debe estar en:
+
+```text
+backend/ai/
+frontend/ai/
+```
+
+## Regla general
+
+La raíz no contiene documentación técnica extensa.
+
+La raíz solo orienta hacia la documentación y contexto correspondiente de cada parte del proyecto.
