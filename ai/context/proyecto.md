@@ -1,35 +1,55 @@
-# Proyecto
-
-## Descripción
-Sistema backend para la gestión de personas, actividades y donaciones, con control de accesos según roles y trazabilidad de cambios.
+# Alcance general del proyecto
 
 ## Objetivo
-Permitir registrar personas, gestionar actividades dentro de un calendario y mantener un historial de donaciones, asegurando control, organización y seguimiento de la información.
+Sistema web orientado a la gestión de personas, actividades y donaciones, con control de accesos según tipo de usuario y trazabilidad de cambios realizados en el sistema.
 
-## Tipo de sistema
-Aplicación web con backend en Django, orientada a múltiples usuarios con diferentes niveles de acceso. Diseñada para crecer progresivamente y con posibilidad futura de evolucionar a app móvil.
+## Incluido en el alcance general
 
-## Usuarios del sistema
-- Administrador del sistema
-- Usuarios con permisos de edición
-- Usuarios con permisos de lectura
-- Personas registradas sin acceso operativo
+- Backend con Django.
+- Frontend web con Django Templates.
+- APIs con Django REST Framework para consumo interno, integraciones y app móvil.
+- Frontend móvil con Kivy.
+- Documentación general del proyecto.
+- Contexto IA general, backend y frontend.
+- Organización del proyecto separando raíz, backend y frontend.
 
-## Funcionalidades principales
-- Registro y gestión de personas
-- Gestión de roles y permisos
-- Registro y gestión de actividades
-- Visualización de actividades en calendario
-- Gestión inicial de actividades globales
-- Posible evolución a agendas personales
-- Registro de donaciones realizadas por personas
-- Historial de donaciones con fecha y detalle de elementos
-- Notificaciones por email
-- Auditoría de inserciones y modificaciones
+## Alcance por etapas
 
-## Integraciones externas
-- Email
+El proyecto puede desarrollarse por etapas.
 
-## Estado del proyecto
-En definición funcional y de estructura base
-En desarrollo
+Primera etapa habitual:
+
+- Backend Django.
+- Templates web.
+- Reglas de negocio.
+- Modelos, vistas, formularios y panel web.
+
+Segunda etapa habitual:
+
+- APIs con DRF.
+- Consumo de datos desde frontend móvil.
+- App móvil con Kivy.
+
+Tercera etapa habitual:
+
+- Compilación APK/AAB.
+- Firma de la app.
+- Distribución o publicación en Play Store.
+
+## Fuera del alcance por defecto
+
+- Funcionalidades no solicitadas explícitamente.
+- Reestructuración completa de proyectos ya iniciados sin necesidad real.
+- Agregar tecnologías externas sin justificación.
+- Mover lógica crítica de negocio al frontend móvil.
+
+## Separación de responsabilidades
+
+- La raíz del proyecto contiene documentación y contexto general.
+- El backend contiene lógica de negocio, datos, templates web y APIs.
+- El frontend móvil, cuando exista, funcionará como cliente de la API.
+- La app móvil no debe contener lógica crítica de negocio.
+
+## Criterio de evolución
+
+El proyecto debe crecer por etapas, evitando agregar estructuras, carpetas o workflows antes de que sean necesarios.

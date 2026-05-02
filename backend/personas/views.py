@@ -1,0 +1,59 @@
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect, render
+
+from personas.forms import TipoDocumentoForm
+from personas.models import TipoDocumento
+
+
+@login_required
+def admin_cargar_personas(request):
+    _require_admin(request.user)
+    return render(request, "dashboard/admin/cargar_personas.html", _dashboard_context(request.user))
+
+
+@login_required
+def admin_cargar_usuarios(request):
+    _require_admin(request.user)
+    return render(request, "dashboard/admin/cargar_usuarios.html", _dashboard_context(request.user))
+
+
+@login_required
+def admin_complemento_tipos_documento(request):
+    _require_admin(request.user)
+    if request.method == "POST":
+        form = TipoDocumentoForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tipo de documento creado correctamente.")
+            return redirect("dashboard_admin_complemento_tipos_documento")
+    else:
+        form = TipoDocumentoForm()
+    items = TipoDocumento.objects.order_by("nombre")
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Tipo de Documento",
+            "description": "Carga los tipos de documento habilitados.",
+            "form": form,
+            "items_title": "Tipos de documento cargados",
+            "items": items,
+            **_dashboard_context(request.user),
+        },
+    )
+
+
+def _require_admin(user):
+    if not (user.is_staff or user.is_superuser):
+        raise PermissionDenied
+
+
+def _dashboard_context(user):
+    nombre = f"{user.nombre} {user.apellido}".strip()
+    return {
+        "welcome_name": nombre or user.email,
+        "role_label": "Administrador del sistema",
+        "company_name": None,
+    }
