@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from personas.forms import TipoDocumentoForm
 from personas.models import TipoDocumento
@@ -31,6 +31,13 @@ def admin_complemento_tipos_documento(request):
     else:
         form = TipoDocumentoForm()
     items = TipoDocumento.objects.order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/tipos-documento/{item.pk}/editar/",
+        }
+        for item in items
+    ]
     return render(
         request,
         "dashboard/admin/complemento_form.html",
@@ -39,7 +46,41 @@ def admin_complemento_tipos_documento(request):
             "description": "Carga los tipos de documento habilitados.",
             "form": form,
             "items_title": "Tipos de documento cargados",
-            "items": items,
+            "items_links": items_links,
+            **_dashboard_context(request.user),
+        },
+    )
+
+
+@login_required
+def admin_complemento_tipos_documento_editar(request, tipo_documento_id):
+    _require_admin(request.user)
+    tipo_documento = get_object_or_404(TipoDocumento, pk=tipo_documento_id)
+    if request.method == "POST":
+        form = TipoDocumentoForm(request.POST, instance=tipo_documento)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Tipo de documento actualizado correctamente.")
+            return redirect("dashboard_admin_complemento_tipos_documento")
+    else:
+        form = TipoDocumentoForm(instance=tipo_documento)
+    items = TipoDocumento.objects.order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/tipos-documento/{item.pk}/editar/",
+        }
+        for item in items
+    ]
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Editar Tipo de Documento",
+            "description": "Modifica un tipo de documento existente. No se elimina desde esta pantalla.",
+            "form": form,
+            "items_title": "Tipos de documento cargados",
+            "items_links": items_links,
             **_dashboard_context(request.user),
         },
     )

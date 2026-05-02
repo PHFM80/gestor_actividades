@@ -34,7 +34,10 @@ class PaisForm(forms.ModelForm):
 
     def clean_nombre(self):
         nombre = self.cleaned_data["nombre"].strip()
-        if Pais.objects.filter(nombre__iexact=nombre).exists():
+        queryset = Pais.objects.filter(nombre__iexact=nombre)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
             raise ValidationError("Ya existe un pais con ese nombre.")
         return nombre
 
@@ -54,6 +57,8 @@ class ProvinciaForm(forms.ModelForm):
         pais = cleaned_data.get("pais")
         if nombre and pais:
             existe = Provincia.objects.filter(nombre__iexact=nombre.strip(), pais=pais)
+            if self.instance.pk:
+                existe = existe.exclude(pk=self.instance.pk)
             if existe.exists():
                 self.add_error("nombre", "Ya existe una provincia con ese nombre en el pais seleccionado.")
         return cleaned_data
@@ -74,6 +79,8 @@ class LocalidadForm(forms.ModelForm):
         provincia = cleaned_data.get("provincia")
         if nombre and provincia:
             existe = Localidad.objects.filter(nombre__iexact=nombre.strip(), provincia=provincia)
+            if self.instance.pk:
+                existe = existe.exclude(pk=self.instance.pk)
             if existe.exists():
                 self.add_error("nombre", "Ya existe una localidad con ese nombre en la provincia seleccionada.")
         return cleaned_data

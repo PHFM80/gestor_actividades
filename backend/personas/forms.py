@@ -17,8 +17,13 @@ class TipoDocumentoForm(forms.ModelForm):
         cleaned_data = super().clean()
         nombre = cleaned_data.get("nombre")
         codigo = cleaned_data.get("codigo")
-        if nombre and TipoDocumento.objects.filter(nombre__iexact=nombre.strip()).exists():
+        nombre_qs = TipoDocumento.objects.filter(nombre__iexact=nombre.strip()) if nombre else TipoDocumento.objects.none()
+        codigo_qs = TipoDocumento.objects.filter(codigo__iexact=codigo.strip()) if codigo else TipoDocumento.objects.none()
+        if self.instance.pk:
+            nombre_qs = nombre_qs.exclude(pk=self.instance.pk)
+            codigo_qs = codigo_qs.exclude(pk=self.instance.pk)
+        if nombre_qs.exists():
             self.add_error("nombre", "Ya existe un tipo de documento con ese nombre.")
-        if codigo and TipoDocumento.objects.filter(codigo__iexact=codigo.strip()).exists():
+        if codigo_qs.exists():
             self.add_error("codigo", "Ya existe un tipo de documento con ese codigo.")
         return cleaned_data

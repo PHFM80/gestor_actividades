@@ -15,7 +15,10 @@ class RolActividadForm(forms.ModelForm):
 
     def clean_nombre(self):
         nombre = self.cleaned_data["nombre"].strip()
-        if RolActividad.objects.filter(nombre__iexact=nombre).exists():
+        queryset = RolActividad.objects.filter(nombre__iexact=nombre)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
             raise forms.ValidationError("Ya existe un rol de actividad con ese nombre.")
         return nombre
 
@@ -31,6 +34,9 @@ class TipoActividadForm(forms.ModelForm):
 
     def clean_nombre(self):
         nombre = self.cleaned_data["nombre"].strip()
-        if TipoActividad.objects.filter(nombre__iexact=nombre).exists():
+        queryset = TipoActividad.objects.filter(nombre__iexact=nombre)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
             raise forms.ValidationError("Ya existe un tipo de actividad con ese nombre.")
         return nombre

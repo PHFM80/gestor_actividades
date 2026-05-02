@@ -82,6 +82,13 @@ def admin_complemento_paises(request):
     else:
         form = PaisForm()
     items = Pais.objects.order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/paises/{item.pk}/editar/",
+        }
+        for item in items
+    ]
     return render(
         request,
         "dashboard/admin/complemento_form.html",
@@ -90,7 +97,7 @@ def admin_complemento_paises(request):
             "description": "Carga paises base para la configuracion geografica.",
             "form": form,
             "items_title": "Paises cargados",
-            "items": items,
+            "items_links": items_links,
             **admin_context(request.user),
         },
     )
@@ -107,9 +114,14 @@ def admin_complemento_provincias(request):
             return redirect("dashboard_admin_complemento_provincias")
     else:
         form = ProvinciaForm()
-    ordered_fields = [form[name] for name in ["pais", "nombre"] if name in form.fields]
     items = Provincia.objects.select_related("pais").order_by("nombre")
-    items_payload = [{"label": str(item), "parent_id": item.pais_id} for item in items]
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/provincias/{item.pk}/editar/",
+        }
+        for item in items
+    ]
     return render(
         request,
         "dashboard/admin/complemento_form.html",
@@ -117,11 +129,8 @@ def admin_complemento_provincias(request):
             "title": "Provincias",
             "description": "Carga provincias asociadas a cada pais.",
             "form": form,
-            "field_ordered": ordered_fields,
             "items_title": "Provincias cargadas",
-            "items_payload": items_payload,
-            "filter_select_id": form["pais"].id_for_label,
-            "filter_empty_text": "Selecciona un pais para ver provincias cargadas.",
+            "items_links": items_links,
             **admin_context(request.user),
         },
     )
@@ -138,9 +147,14 @@ def admin_complemento_localidades(request):
             return redirect("dashboard_admin_complemento_localidades")
     else:
         form = LocalidadForm()
-    ordered_fields = [form[name] for name in ["provincia", "nombre"] if name in form.fields]
     items = Localidad.objects.select_related("provincia").order_by("nombre")
-    items_payload = [{"label": str(item), "parent_id": item.provincia_id} for item in items]
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/localidades/{item.pk}/editar/",
+        }
+        for item in items
+    ]
     return render(
         request,
         "dashboard/admin/complemento_form.html",
@@ -148,11 +162,110 @@ def admin_complemento_localidades(request):
             "title": "Localidades",
             "description": "Carga localidades asociadas a cada provincia.",
             "form": form,
-            "field_ordered": ordered_fields,
             "items_title": "Localidades cargadas",
-            "items_payload": items_payload,
-            "filter_select_id": form["provincia"].id_for_label,
-            "filter_empty_text": "Selecciona una provincia para ver localidades cargadas.",
+            "items_links": items_links,
+            **admin_context(request.user),
+        },
+    )
+
+
+@login_required
+def admin_complemento_paises_editar(request, pais_id):
+    require_admin(request.user)
+    pais = get_object_or_404(Pais, pk=pais_id)
+    if request.method == "POST":
+        form = PaisForm(request.POST, instance=pais)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Pais actualizado correctamente.")
+            return redirect("dashboard_admin_complemento_paises")
+    else:
+        form = PaisForm(instance=pais)
+    items = Pais.objects.order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/paises/{item.pk}/editar/",
+        }
+        for item in items
+    ]
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Editar Pais",
+            "description": "Modifica un pais existente. No se elimina desde esta pantalla.",
+            "form": form,
+            "items_title": "Paises cargados",
+            "items_links": items_links,
+            **admin_context(request.user),
+        },
+    )
+
+
+@login_required
+def admin_complemento_provincias_editar(request, provincia_id):
+    require_admin(request.user)
+    provincia = get_object_or_404(Provincia, pk=provincia_id)
+    if request.method == "POST":
+        form = ProvinciaForm(request.POST, instance=provincia)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Provincia actualizada correctamente.")
+            return redirect("dashboard_admin_complemento_provincias")
+    else:
+        form = ProvinciaForm(instance=provincia)
+    items = Provincia.objects.select_related("pais").order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/provincias/{item.pk}/editar/",
+        }
+        for item in items
+    ]
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Editar Provincia",
+            "description": "Modifica una provincia existente. No se elimina desde esta pantalla.",
+            "form": form,
+            "items_title": "Provincias cargadas",
+            "items_links": items_links,
+            **admin_context(request.user),
+        },
+    )
+
+
+@login_required
+def admin_complemento_localidades_editar(request, localidad_id):
+    require_admin(request.user)
+    localidad = get_object_or_404(Localidad, pk=localidad_id)
+    if request.method == "POST":
+        form = LocalidadForm(request.POST, instance=localidad)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Localidad actualizada correctamente.")
+            return redirect("dashboard_admin_complemento_localidades")
+    else:
+        form = LocalidadForm(instance=localidad)
+    items = Localidad.objects.select_related("provincia").order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/localidades/{item.pk}/editar/",
+        }
+        for item in items
+    ]
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Editar Localidad",
+            "description": "Modifica una localidad existente. No se elimina desde esta pantalla.",
+            "form": form,
+            "items_title": "Localidades cargadas",
+            "items_links": items_links,
             **admin_context(request.user),
         },
     )
