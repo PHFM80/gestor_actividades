@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, redirect, render
 
+from core.services.complementos_audit import cleaned_data_snapshot, log_complemento_event
 from donaciones.forms import UnidadMedidaForm
 from donaciones.models import UnidadMedida
 
@@ -19,9 +20,27 @@ def admin_complemento_unidades_medida(request):
     if request.method == "POST":
         form = UnidadMedidaForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="unidad_medida",
+                status="success",
+                model_name="UnidadMedida",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Unidad de medida creada correctamente.")
             return redirect("dashboard_admin_complemento_unidades_medida")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="unidad_medida",
+            status="error",
+            model_name="UnidadMedida",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = UnidadMedidaForm()
     items = UnidadMedida.objects.order_by("nombre")
@@ -51,11 +70,32 @@ def admin_complemento_unidades_medida_editar(request, unidad_medida_id):
     _require_admin(request.user)
     unidad_medida = get_object_or_404(UnidadMedida, pk=unidad_medida_id)
     if request.method == "POST":
+        before = {"nombre": unidad_medida.nombre}
         form = UnidadMedidaForm(request.POST, instance=unidad_medida)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="unidad_medida",
+                status="success",
+                model_name="UnidadMedida",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Unidad de medida actualizada correctamente.")
             return redirect("dashboard_admin_complemento_unidades_medida")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="unidad_medida",
+            status="error",
+            model_name="UnidadMedida",
+            registro_id=unidad_medida.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = UnidadMedidaForm(instance=unidad_medida)
     items = UnidadMedida.objects.order_by("nombre")

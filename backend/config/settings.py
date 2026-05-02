@@ -168,3 +168,27 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+LOG_DIR = BASE_DIR / 'logs'
+os.makedirs(LOG_DIR, exist_ok=True)
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'complementos_file': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': str(LOG_DIR / 'complementos.log'),
+            'maxBytes': 10 * 1024 * 1024,
+            'backupCount': 5,
+            'encoding': 'utf-8',
+        },
+    },
+    'loggers': {
+        'complementos_audit': {
+            'handlers': ['complementos_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}

@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -157,3 +159,33 @@ class AdminComplementosCoreTests(TestCase):
         response_edicion = self.client.get(reverse("dashboard_admin_complemento_paises_editar", args=[pais.pk]))
         self.assertEqual(response_edicion.status_code, 200)
         self.assertNotContains(response_edicion, ">Eliminar<", html=False)
+
+    def test_auditoria_log_create_y_error(self):
+        self.client.force_login(self.admin)
+
+        with self.assertLogs("complementos_audit", level="INFO") as cm:
+            self.client.post(reverse("dashboard_admin_complemento_paises"), {"nombre": "Uruguay", "codigo": "UY"})
+        payload_ok = json.loads(cm.output[-1].split("INFO:complementos_audit:")[1])
+        self.assertEqual(payload_ok["event"], "complemento.create")
+        self.assertEqual(payload_ok["complemento_tipo"], "pais")
+        self.assertEqual(payload_ok["estado"], "success")
+
+        Pais.objects.create(nombre="Paraguay", codigo="PY")
+        with self.assertLogs("complementos_audit", level="INFO") as cm_error:
+            self.client.post(reverse("dashboard_admin_complemento_paises"), {"nombre": "Paraguay", "codigo": "PYA"})
+        payload_error = json.loads(cm_error.output[-1].split("INFO:complementos_audit:")[1])
+        self.assertEqual(payload_error["estado"], "error")
+        self.assertTrue(payload_error["errores"])
+
+    def test_auditoria_log_update_y_diff(self):
+        self.client.force_login(self.admin)
+        pais = Pais.objects.create(nombre="Brasil", codigo="BR")
+        with self.assertLogs("complementos_audit", level="INFO") as cm:
+            self.client.post(
+                reverse("dashboard_admin_complemento_paises_editar", args=[pais.pk]),
+                {"nombre": "Brasil Federal", "codigo": "BRF"},
+            )
+        payload = json.loads(cm.output[-1].split("INFO:complementos_audit:")[1])
+        self.assertEqual(payload["event"], "complemento.update")
+        self.assertEqual(payload["estado"], "success")
+        self.assertIn("nombre", payload["cambios"])

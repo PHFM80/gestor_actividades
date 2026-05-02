@@ -27,6 +27,11 @@ Cada app usa paquete `tests/` con `__init__.py` para discovery estandar de Djang
 4. Regla de no eliminacion en UI
 - Se verifica que las pantallas de complementos no muestren accion `Eliminar`.
 
+5. Auditoria en log
+- Se validan eventos de auditoria en logger `complementos_audit`.
+- Se prueban casos `success` y `error`.
+- Se valida presencia de campos clave (`event`, `complemento_tipo`, `estado`, `cambios/errores`).
+
 ## Ejecucion
 
 Desde `backend/`:

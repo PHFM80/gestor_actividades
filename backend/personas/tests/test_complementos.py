@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -69,3 +71,15 @@ class AdminComplementosPersonasTests(TestCase):
         )
         self.assertEqual(duplicado_codigo.status_code, 200)
         self.assertContains(duplicado_codigo, "Ya existe un tipo de documento con ese codigo.")
+
+    def test_auditoria_log_en_tipos_documento_error(self):
+        self.client.force_login(self.admin)
+        TipoDocumento.objects.create(nombre="Cedula", codigo="CED")
+        with self.assertLogs("complementos_audit", level="INFO") as cm:
+            self.client.post(
+                reverse("dashboard_admin_complemento_tipos_documento"),
+                {"nombre": "Cedula", "codigo": "CED2"},
+            )
+        payload = json.loads(cm.output[-1].split("INFO:complementos_audit:")[1])
+        self.assertEqual(payload["complemento_tipo"], "tipo_documento")
+        self.assertEqual(payload["estado"], "error")

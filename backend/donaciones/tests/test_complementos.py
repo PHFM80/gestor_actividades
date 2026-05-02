@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -62,3 +64,16 @@ class AdminComplementosDonacionesTests(TestCase):
         )
         self.assertEqual(duplicado.status_code, 200)
         self.assertContains(duplicado, "Ya existe una unidad de medida con ese nombre.")
+
+    def test_auditoria_log_en_unidad_medida_update(self):
+        self.client.force_login(self.admin)
+        unidad = UnidadMedida.objects.create(nombre="Bolsa")
+        with self.assertLogs("complementos_audit", level="INFO") as cm:
+            self.client.post(
+                reverse("dashboard_admin_complemento_unidades_medida_editar", args=[unidad.pk]),
+                {"nombre": "Bolsa Grande"},
+            )
+        payload = json.loads(cm.output[-1].split("INFO:complementos_audit:")[1])
+        self.assertEqual(payload["complemento_tipo"], "unidad_medida")
+        self.assertEqual(payload["event"], "complemento.update")
+        self.assertEqual(payload["estado"], "success")

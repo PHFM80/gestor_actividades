@@ -55,3 +55,8 @@ Este documento describe los cambios recientes sobre complementos en el dashboard
 
 - No se agregaron endpoints de borrado en estas pantallas.
 - La eliminacion no se expone desde UI de complementos.
+
+## Auditoria
+
+- Cada alta y edicion de complementos se registra en `backend/logs/complementos.log`.
+- Tambien se registran intentos fallidos de creacion/edicion con estado `error`.

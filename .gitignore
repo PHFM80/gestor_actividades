@@ -5,6 +5,7 @@ db.sqlite3
 .env
 .env.*
 *.log
+backend/logs/
 .DS_Store
 
 # Virtual env

@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from actividades.forms import RolActividadForm, TipoActividadForm
 from actividades.models import RolActividad, TipoActividad
+from core.services.complementos_audit import cleaned_data_snapshot, log_complemento_event
 
 
 @login_required
@@ -19,9 +20,27 @@ def admin_complemento_roles_actividad(request):
     if request.method == "POST":
         form = RolActividadForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="rol_actividad",
+                status="success",
+                model_name="RolActividad",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Rol de actividad creado correctamente.")
             return redirect("dashboard_admin_complemento_roles_actividad")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="rol_actividad",
+            status="error",
+            model_name="RolActividad",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = RolActividadForm()
     items = RolActividad.objects.order_by("nombre")
@@ -52,9 +71,27 @@ def admin_complemento_tipos_actividad(request):
     if request.method == "POST":
         form = TipoActividadForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="tipo_actividad",
+                status="success",
+                model_name="TipoActividad",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Tipo de actividad creado correctamente.")
             return redirect("dashboard_admin_complemento_tipos_actividad")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="tipo_actividad",
+            status="error",
+            model_name="TipoActividad",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = TipoActividadForm()
     items = TipoActividad.objects.order_by("nombre")
@@ -84,11 +121,32 @@ def admin_complemento_roles_actividad_editar(request, rol_actividad_id):
     _require_admin(request.user)
     rol_actividad = get_object_or_404(RolActividad, pk=rol_actividad_id)
     if request.method == "POST":
+        before = {"nombre": rol_actividad.nombre, "descripcion": rol_actividad.descripcion}
         form = RolActividadForm(request.POST, instance=rol_actividad)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="rol_actividad",
+                status="success",
+                model_name="RolActividad",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Rol de actividad actualizado correctamente.")
             return redirect("dashboard_admin_complemento_roles_actividad")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="rol_actividad",
+            status="error",
+            model_name="RolActividad",
+            registro_id=rol_actividad.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = RolActividadForm(instance=rol_actividad)
     items = RolActividad.objects.order_by("nombre")
@@ -118,11 +176,32 @@ def admin_complemento_tipos_actividad_editar(request, tipo_actividad_id):
     _require_admin(request.user)
     tipo_actividad = get_object_or_404(TipoActividad, pk=tipo_actividad_id)
     if request.method == "POST":
+        before = {"nombre": tipo_actividad.nombre, "descripcion": tipo_actividad.descripcion}
         form = TipoActividadForm(request.POST, instance=tipo_actividad)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="tipo_actividad",
+                status="success",
+                model_name="TipoActividad",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Tipo de actividad actualizado correctamente.")
             return redirect("dashboard_admin_complemento_tipos_actividad")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="tipo_actividad",
+            status="error",
+            model_name="TipoActividad",
+            registro_id=tipo_actividad.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = TipoActividadForm(instance=tipo_actividad)
     items = TipoActividad.objects.order_by("nombre")

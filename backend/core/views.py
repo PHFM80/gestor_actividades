@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from core.forms import LocalidadForm, PaisForm, ProvinciaForm, RolSistemaForm
 from core.models import RolSistema
+from core.services.complementos_audit import cleaned_data_snapshot, log_complemento_event
 from core.services.roles_sistema import crear_rol_sistema, editar_rol_sistema
 from geo.models import Localidad, Pais, Provincia
 
@@ -76,9 +77,27 @@ def admin_complemento_paises(request):
     if request.method == "POST":
         form = PaisForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="pais",
+                status="success",
+                model_name="Pais",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Pais creado correctamente.")
             return redirect("dashboard_admin_complemento_paises")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="pais",
+            status="error",
+            model_name="Pais",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = PaisForm()
     items = Pais.objects.order_by("nombre")
@@ -109,9 +128,27 @@ def admin_complemento_provincias(request):
     if request.method == "POST":
         form = ProvinciaForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="provincia",
+                status="success",
+                model_name="Provincia",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Provincia creada correctamente.")
             return redirect("dashboard_admin_complemento_provincias")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="provincia",
+            status="error",
+            model_name="Provincia",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = ProvinciaForm()
     items = Provincia.objects.select_related("pais").order_by("nombre")
@@ -142,9 +179,27 @@ def admin_complemento_localidades(request):
     if request.method == "POST":
         form = LocalidadForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="localidad",
+                status="success",
+                model_name="Localidad",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Localidad creada correctamente.")
             return redirect("dashboard_admin_complemento_localidades")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="localidad",
+            status="error",
+            model_name="Localidad",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = LocalidadForm()
     items = Localidad.objects.select_related("provincia").order_by("nombre")
@@ -174,11 +229,32 @@ def admin_complemento_paises_editar(request, pais_id):
     require_admin(request.user)
     pais = get_object_or_404(Pais, pk=pais_id)
     if request.method == "POST":
+        before = {"nombre": pais.nombre, "codigo": pais.codigo}
         form = PaisForm(request.POST, instance=pais)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="pais",
+                status="success",
+                model_name="Pais",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Pais actualizado correctamente.")
             return redirect("dashboard_admin_complemento_paises")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="pais",
+            status="error",
+            model_name="Pais",
+            registro_id=pais.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = PaisForm(instance=pais)
     items = Pais.objects.order_by("nombre")
@@ -208,11 +284,32 @@ def admin_complemento_provincias_editar(request, provincia_id):
     require_admin(request.user)
     provincia = get_object_or_404(Provincia, pk=provincia_id)
     if request.method == "POST":
+        before = {"nombre": provincia.nombre, "pais": provincia.pais_id}
         form = ProvinciaForm(request.POST, instance=provincia)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="provincia",
+                status="success",
+                model_name="Provincia",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Provincia actualizada correctamente.")
             return redirect("dashboard_admin_complemento_provincias")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="provincia",
+            status="error",
+            model_name="Provincia",
+            registro_id=provincia.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = ProvinciaForm(instance=provincia)
     items = Provincia.objects.select_related("pais").order_by("nombre")
@@ -242,11 +339,32 @@ def admin_complemento_localidades_editar(request, localidad_id):
     require_admin(request.user)
     localidad = get_object_or_404(Localidad, pk=localidad_id)
     if request.method == "POST":
+        before = {"nombre": localidad.nombre, "provincia": localidad.provincia_id}
         form = LocalidadForm(request.POST, instance=localidad)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="localidad",
+                status="success",
+                model_name="Localidad",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Localidad actualizada correctamente.")
             return redirect("dashboard_admin_complemento_localidades")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="localidad",
+            status="error",
+            model_name="Localidad",
+            registro_id=localidad.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = LocalidadForm(instance=localidad)
     items = Localidad.objects.select_related("provincia").order_by("nombre")
@@ -278,7 +396,7 @@ def admin_complemento_roles_sistema(request):
         form = RolSistemaForm(request.POST)
         if form.is_valid():
             try:
-                crear_rol_sistema(
+                instance = crear_rol_sistema(
                     nombre=form.cleaned_data["nombre"],
                     codigo=form.cleaned_data.get("codigo"),
                     descripcion=form.cleaned_data.get("descripcion", ""),
@@ -294,9 +412,36 @@ def admin_complemento_roles_sistema(request):
                                 form.add_error(None, error)
                 else:
                     form.add_error(None, str(exc))
+                log_complemento_event(
+                    request=request,
+                    event="complemento.create",
+                    complemento_tipo="rol_sistema",
+                    status="error",
+                    model_name="RolSistema",
+                    errors=form.errors.get_json_data(),
+                )
             else:
+                log_complemento_event(
+                    request=request,
+                    event="complemento.create",
+                    complemento_tipo="rol_sistema",
+                    status="success",
+                    model_name="RolSistema",
+                    registro_id=instance.pk,
+                    before={},
+                    after=cleaned_data_snapshot(form),
+                )
                 messages.success(request, "Rol de sistema creado correctamente.")
                 return redirect("dashboard_admin_complemento_roles_sistema")
+        else:
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="rol_sistema",
+                status="error",
+                model_name="RolSistema",
+                errors=form.errors.get_json_data(),
+            )
     else:
         form = RolSistemaForm()
     items = RolSistema.objects.order_by("nombre")
@@ -326,10 +471,16 @@ def admin_complemento_roles_sistema_editar(request, rol_id):
     require_admin(request.user)
     rol = get_object_or_404(RolSistema, pk=rol_id)
     if request.method == "POST":
+        before = {
+            "nombre": rol.nombre,
+            "codigo": rol.codigo,
+            "descripcion": rol.descripcion,
+            "activo": rol.activo,
+        }
         form = RolSistemaForm(request.POST, instance=rol)
         if form.is_valid():
             try:
-                editar_rol_sistema(
+                instance = editar_rol_sistema(
                     rol=rol,
                     nombre=form.cleaned_data["nombre"],
                     codigo=form.cleaned_data.get("codigo"),
@@ -346,9 +497,40 @@ def admin_complemento_roles_sistema_editar(request, rol_id):
                                 form.add_error(None, error)
                 else:
                     form.add_error(None, str(exc))
+                log_complemento_event(
+                    request=request,
+                    event="complemento.update",
+                    complemento_tipo="rol_sistema",
+                    status="error",
+                    model_name="RolSistema",
+                    registro_id=rol.pk,
+                    before=before,
+                    errors=form.errors.get_json_data(),
+                )
             else:
+                log_complemento_event(
+                    request=request,
+                    event="complemento.update",
+                    complemento_tipo="rol_sistema",
+                    status="success",
+                    model_name="RolSistema",
+                    registro_id=instance.pk,
+                    before=before,
+                    after=cleaned_data_snapshot(form),
+                )
                 messages.success(request, "Rol de sistema actualizado correctamente.")
                 return redirect("dashboard_admin_complemento_roles_sistema")
+        else:
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="rol_sistema",
+                status="error",
+                model_name="RolSistema",
+                registro_id=rol.pk,
+                before=before,
+                errors=form.errors.get_json_data(),
+            )
     else:
         form = RolSistemaForm(instance=rol)
 

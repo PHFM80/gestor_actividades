@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -90,3 +92,14 @@ class AdminComplementosActividadesTests(TestCase):
         )
         self.assertEqual(duplicado.status_code, 200)
         self.assertContains(duplicado, "Ya existe un tipo de actividad con ese nombre.")
+
+    def test_auditoria_log_en_tipos_actividad(self):
+        self.client.force_login(self.admin)
+        with self.assertLogs("complementos_audit", level="INFO") as cm:
+            self.client.post(
+                reverse("dashboard_admin_complemento_tipos_actividad"),
+                {"nombre": "Encuentro", "descripcion": "desc"},
+            )
+        payload = json.loads(cm.output[-1].split("INFO:complementos_audit:")[1])
+        self.assertEqual(payload["complemento_tipo"], "tipo_actividad")
+        self.assertEqual(payload["estado"], "success")
