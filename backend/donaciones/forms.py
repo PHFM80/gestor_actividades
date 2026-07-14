@@ -15,6 +15,9 @@ class UnidadMedidaForm(forms.ModelForm):
 
     def clean_nombre(self):
         nombre = self.cleaned_data["nombre"].strip()
-        if UnidadMedida.objects.filter(nombre__iexact=nombre).exists():
+        queryset = UnidadMedida.objects.filter(nombre__iexact=nombre)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
             raise forms.ValidationError("Ya existe una unidad de medida con ese nombre.")
         return nombre

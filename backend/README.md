@@ -28,3 +28,6 @@ python manage.py runserver
 - `docs/templates.md` - Vistas, herencia y orden de assets.
 - `docs/themes.md` - Sistema de modo claro/oscuro y variables CSS.
 - `docs/dashboard_admin.md` - Flujos disponibles del panel admin actual.
+- `docs/complementos.md` - Reglas funcionales y rutas de complementos del dashboard admin.
+- `docs/tests_complementos.md` - Cobertura de pruebas de complementos y estructura por dominio.
+- `docs/auditoria_complementos.md` - Auditoria JSONL de altas/modificaciones de complementos.

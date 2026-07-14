@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from core.forms import LocalidadForm, PaisForm, ProvinciaForm, RolSistemaForm
 from core.models import RolSistema
+from core.services.complementos_audit import cleaned_data_snapshot, log_complemento_event
 from core.services.roles_sistema import crear_rol_sistema, editar_rol_sistema
 from geo.models import Localidad, Pais, Provincia
 
@@ -76,12 +77,37 @@ def admin_complemento_paises(request):
     if request.method == "POST":
         form = PaisForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="pais",
+                status="success",
+                model_name="Pais",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Pais creado correctamente.")
             return redirect("dashboard_admin_complemento_paises")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="pais",
+            status="error",
+            model_name="Pais",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = PaisForm()
     items = Pais.objects.order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/paises/{item.pk}/editar/",
+        }
+        for item in items
+    ]
     return render(
         request,
         "dashboard/admin/complemento_form.html",
@@ -90,7 +116,7 @@ def admin_complemento_paises(request):
             "description": "Carga paises base para la configuracion geografica.",
             "form": form,
             "items_title": "Paises cargados",
-            "items": items,
+            "items_links": items_links,
             **admin_context(request.user),
         },
     )
@@ -102,14 +128,37 @@ def admin_complemento_provincias(request):
     if request.method == "POST":
         form = ProvinciaForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="provincia",
+                status="success",
+                model_name="Provincia",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Provincia creada correctamente.")
             return redirect("dashboard_admin_complemento_provincias")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="provincia",
+            status="error",
+            model_name="Provincia",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = ProvinciaForm()
-    ordered_fields = [form[name] for name in ["pais", "nombre"] if name in form.fields]
     items = Provincia.objects.select_related("pais").order_by("nombre")
-    items_payload = [{"label": str(item), "parent_id": item.pais_id} for item in items]
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/provincias/{item.pk}/editar/",
+        }
+        for item in items
+    ]
     return render(
         request,
         "dashboard/admin/complemento_form.html",
@@ -117,11 +166,8 @@ def admin_complemento_provincias(request):
             "title": "Provincias",
             "description": "Carga provincias asociadas a cada pais.",
             "form": form,
-            "field_ordered": ordered_fields,
             "items_title": "Provincias cargadas",
-            "items_payload": items_payload,
-            "filter_select_id": form["pais"].id_for_label,
-            "filter_empty_text": "Selecciona un pais para ver provincias cargadas.",
+            "items_links": items_links,
             **admin_context(request.user),
         },
     )
@@ -133,14 +179,37 @@ def admin_complemento_localidades(request):
     if request.method == "POST":
         form = LocalidadForm(request.POST)
         if form.is_valid():
-            form.save()
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="localidad",
+                status="success",
+                model_name="Localidad",
+                registro_id=instance.pk,
+                before={},
+                after=cleaned_data_snapshot(form),
+            )
             messages.success(request, "Localidad creada correctamente.")
             return redirect("dashboard_admin_complemento_localidades")
+        log_complemento_event(
+            request=request,
+            event="complemento.create",
+            complemento_tipo="localidad",
+            status="error",
+            model_name="Localidad",
+            errors=form.errors.get_json_data(),
+        )
     else:
         form = LocalidadForm()
-    ordered_fields = [form[name] for name in ["provincia", "nombre"] if name in form.fields]
     items = Localidad.objects.select_related("provincia").order_by("nombre")
-    items_payload = [{"label": str(item), "parent_id": item.provincia_id} for item in items]
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/localidades/{item.pk}/editar/",
+        }
+        for item in items
+    ]
     return render(
         request,
         "dashboard/admin/complemento_form.html",
@@ -148,11 +217,173 @@ def admin_complemento_localidades(request):
             "title": "Localidades",
             "description": "Carga localidades asociadas a cada provincia.",
             "form": form,
-            "field_ordered": ordered_fields,
             "items_title": "Localidades cargadas",
-            "items_payload": items_payload,
-            "filter_select_id": form["provincia"].id_for_label,
-            "filter_empty_text": "Selecciona una provincia para ver localidades cargadas.",
+            "items_links": items_links,
+            **admin_context(request.user),
+        },
+    )
+
+
+@login_required
+def admin_complemento_paises_editar(request, pais_id):
+    require_admin(request.user)
+    pais = get_object_or_404(Pais, pk=pais_id)
+    if request.method == "POST":
+        before = {"nombre": pais.nombre, "codigo": pais.codigo}
+        form = PaisForm(request.POST, instance=pais)
+        if form.is_valid():
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="pais",
+                status="success",
+                model_name="Pais",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
+            messages.success(request, "Pais actualizado correctamente.")
+            return redirect("dashboard_admin_complemento_paises")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="pais",
+            status="error",
+            model_name="Pais",
+            registro_id=pais.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
+    else:
+        form = PaisForm(instance=pais)
+    items = Pais.objects.order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/paises/{item.pk}/editar/",
+        }
+        for item in items
+    ]
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Editar Pais",
+            "description": "Modifica un pais existente. No se elimina desde esta pantalla.",
+            "form": form,
+            "items_title": "Paises cargados",
+            "items_links": items_links,
+            **admin_context(request.user),
+        },
+    )
+
+
+@login_required
+def admin_complemento_provincias_editar(request, provincia_id):
+    require_admin(request.user)
+    provincia = get_object_or_404(Provincia, pk=provincia_id)
+    if request.method == "POST":
+        before = {"nombre": provincia.nombre, "pais": provincia.pais_id}
+        form = ProvinciaForm(request.POST, instance=provincia)
+        if form.is_valid():
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="provincia",
+                status="success",
+                model_name="Provincia",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
+            messages.success(request, "Provincia actualizada correctamente.")
+            return redirect("dashboard_admin_complemento_provincias")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="provincia",
+            status="error",
+            model_name="Provincia",
+            registro_id=provincia.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
+    else:
+        form = ProvinciaForm(instance=provincia)
+    items = Provincia.objects.select_related("pais").order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/provincias/{item.pk}/editar/",
+        }
+        for item in items
+    ]
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Editar Provincia",
+            "description": "Modifica una provincia existente. No se elimina desde esta pantalla.",
+            "form": form,
+            "items_title": "Provincias cargadas",
+            "items_links": items_links,
+            **admin_context(request.user),
+        },
+    )
+
+
+@login_required
+def admin_complemento_localidades_editar(request, localidad_id):
+    require_admin(request.user)
+    localidad = get_object_or_404(Localidad, pk=localidad_id)
+    if request.method == "POST":
+        before = {"nombre": localidad.nombre, "provincia": localidad.provincia_id}
+        form = LocalidadForm(request.POST, instance=localidad)
+        if form.is_valid():
+            instance = form.save()
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="localidad",
+                status="success",
+                model_name="Localidad",
+                registro_id=instance.pk,
+                before=before,
+                after=cleaned_data_snapshot(form),
+            )
+            messages.success(request, "Localidad actualizada correctamente.")
+            return redirect("dashboard_admin_complemento_localidades")
+        log_complemento_event(
+            request=request,
+            event="complemento.update",
+            complemento_tipo="localidad",
+            status="error",
+            model_name="Localidad",
+            registro_id=localidad.pk,
+            before=before,
+            errors=form.errors.get_json_data(),
+        )
+    else:
+        form = LocalidadForm(instance=localidad)
+    items = Localidad.objects.select_related("provincia").order_by("nombre")
+    items_links = [
+        {
+            "label": str(item),
+            "url": f"/dashboard/admin/complementos/localidades/{item.pk}/editar/",
+        }
+        for item in items
+    ]
+    return render(
+        request,
+        "dashboard/admin/complemento_form.html",
+        {
+            "title": "Editar Localidad",
+            "description": "Modifica una localidad existente. No se elimina desde esta pantalla.",
+            "form": form,
+            "items_title": "Localidades cargadas",
+            "items_links": items_links,
             **admin_context(request.user),
         },
     )
@@ -165,7 +396,7 @@ def admin_complemento_roles_sistema(request):
         form = RolSistemaForm(request.POST)
         if form.is_valid():
             try:
-                crear_rol_sistema(
+                instance = crear_rol_sistema(
                     nombre=form.cleaned_data["nombre"],
                     codigo=form.cleaned_data.get("codigo"),
                     descripcion=form.cleaned_data.get("descripcion", ""),
@@ -181,9 +412,36 @@ def admin_complemento_roles_sistema(request):
                                 form.add_error(None, error)
                 else:
                     form.add_error(None, str(exc))
+                log_complemento_event(
+                    request=request,
+                    event="complemento.create",
+                    complemento_tipo="rol_sistema",
+                    status="error",
+                    model_name="RolSistema",
+                    errors=form.errors.get_json_data(),
+                )
             else:
+                log_complemento_event(
+                    request=request,
+                    event="complemento.create",
+                    complemento_tipo="rol_sistema",
+                    status="success",
+                    model_name="RolSistema",
+                    registro_id=instance.pk,
+                    before={},
+                    after=cleaned_data_snapshot(form),
+                )
                 messages.success(request, "Rol de sistema creado correctamente.")
                 return redirect("dashboard_admin_complemento_roles_sistema")
+        else:
+            log_complemento_event(
+                request=request,
+                event="complemento.create",
+                complemento_tipo="rol_sistema",
+                status="error",
+                model_name="RolSistema",
+                errors=form.errors.get_json_data(),
+            )
     else:
         form = RolSistemaForm()
     items = RolSistema.objects.order_by("nombre")
@@ -213,10 +471,16 @@ def admin_complemento_roles_sistema_editar(request, rol_id):
     require_admin(request.user)
     rol = get_object_or_404(RolSistema, pk=rol_id)
     if request.method == "POST":
+        before = {
+            "nombre": rol.nombre,
+            "codigo": rol.codigo,
+            "descripcion": rol.descripcion,
+            "activo": rol.activo,
+        }
         form = RolSistemaForm(request.POST, instance=rol)
         if form.is_valid():
             try:
-                editar_rol_sistema(
+                instance = editar_rol_sistema(
                     rol=rol,
                     nombre=form.cleaned_data["nombre"],
                     codigo=form.cleaned_data.get("codigo"),
@@ -233,9 +497,40 @@ def admin_complemento_roles_sistema_editar(request, rol_id):
                                 form.add_error(None, error)
                 else:
                     form.add_error(None, str(exc))
+                log_complemento_event(
+                    request=request,
+                    event="complemento.update",
+                    complemento_tipo="rol_sistema",
+                    status="error",
+                    model_name="RolSistema",
+                    registro_id=rol.pk,
+                    before=before,
+                    errors=form.errors.get_json_data(),
+                )
             else:
+                log_complemento_event(
+                    request=request,
+                    event="complemento.update",
+                    complemento_tipo="rol_sistema",
+                    status="success",
+                    model_name="RolSistema",
+                    registro_id=instance.pk,
+                    before=before,
+                    after=cleaned_data_snapshot(form),
+                )
                 messages.success(request, "Rol de sistema actualizado correctamente.")
                 return redirect("dashboard_admin_complemento_roles_sistema")
+        else:
+            log_complemento_event(
+                request=request,
+                event="complemento.update",
+                complemento_tipo="rol_sistema",
+                status="error",
+                model_name="RolSistema",
+                registro_id=rol.pk,
+                before=before,
+                errors=form.errors.get_json_data(),
+            )
     else:
         form = RolSistemaForm(instance=rol)
 
